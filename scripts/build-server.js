@@ -35,6 +35,30 @@ function getTargetTriple() {
   }
 }
 
+function getNodeRuntimeFileName(target) {
+  return target.includes('windows')
+    ? `node-runtime-${target}.exe`
+    : `node-runtime-${target}`;
+}
+
+function copyNodeRuntime(target) {
+  const runtimeFileName = getNodeRuntimeFileName(target);
+  const runtimePath = path.join(BINARIES_DIR, runtimeFileName);
+  const sourceRuntime = process.env.AIYOU_NODE_RUNTIME_PATH || process.execPath;
+
+  if (!fs.existsSync(sourceRuntime)) {
+    throw new Error(`[build-server] Node runtime not found: ${sourceRuntime}`);
+  }
+
+  fs.copyFileSync(sourceRuntime, runtimePath);
+  if (!target.includes('windows')) {
+    fs.chmodSync(runtimePath, 0o755);
+  }
+
+  console.log(`[build-server] Bundled Node runtime: ${sourceRuntime} -> ${runtimePath}`);
+  return runtimeFileName;
+}
+
 async function build() {
   const targetTriple = getTargetTriple();
   console.log(`[build-server] Target: ${targetTriple}`);
@@ -42,9 +66,14 @@ async function build() {
   // 1. 确保 binaries 目录存在
   fs.mkdirSync(BINARIES_DIR, { recursive: true });
 
-  // 2. 安装 server 依赖
-  console.log('[build-server] Installing server dependencies...');
-  execSync('pnpm install', { cwd: SERVER_DIR, stdio: 'inherit' });
+  // 2. 安装 server 依赖（仅当缺失时）
+  const serverNodeModules = path.join(SERVER_DIR, 'node_modules');
+  if (!fs.existsSync(serverNodeModules)) {
+    console.log('[build-server] Installing server dependencies...');
+    execSync('pnpm install', { cwd: SERVER_DIR, stdio: 'inherit' });
+  } else {
+    console.log('[build-server] Reusing existing server/node_modules');
+  }
 
   // 3. 用 esbuild JS API 打包 server
   console.log('[build-server] Bundling server with esbuild...');
@@ -97,20 +126,15 @@ async function build() {
   }
 
   // 6. 创建 sidecar 启动脚本
-  // 支持通过 CLI 参数指定额外的 target triples（用于 Universal / 多平台构建）
+  // 支持通过 CLI 参数指定额外的 target triples（用于多平台构建）
   const extraTargets = process.argv.slice(2);
-  const allTargets = new Set([targetTriple, ...extraTargets]);
-
-  // macOS: 如果包含任一 darwin target，自动添加 universal
-  const hasDarwin = [...allTargets].some(t => t.includes('apple-darwin'));
-  if (hasDarwin) {
-    allTargets.add('aarch64-apple-darwin');
-    allTargets.add('x86_64-apple-darwin');
-    allTargets.add('universal-apple-darwin');
-  }
+  const allTargets = extraTargets.length > 0
+    ? new Set(extraTargets)
+    : new Set([targetTriple]);
 
   for (const target of allTargets) {
     const isWindows = target.includes('windows');
+    const runtimeFileName = copyNodeRuntime(target);
 
     if (isWindows) {
       // Tauri expects .exe for sidecar on Windows
@@ -124,18 +148,34 @@ async function build() {
       // In .app bundle: sidecar is in Contents/MacOS/, resources in Contents/Resources/binaries/
       // In dev mode: everything is in src-tauri/binaries/
       const shContent = `#!/bin/sh
+set -e
 DIR="$(cd "$(dirname "$0")" && pwd)"
 BUNDLE="$DIR/server-bundle.cjs"
 if [ ! -f "$BUNDLE" ]; then
   BUNDLE="$DIR/../Resources/binaries/server-bundle.cjs"
 fi
+
+NODE_BIN="$DIR/${runtimeFileName}"
+if [ ! -f "$NODE_BIN" ]; then
+  NODE_BIN="$DIR/../Resources/binaries/${runtimeFileName}"
+fi
+
+if [ ! -f "$NODE_BIN" ]; then
+  echo "[aiyou-server] Node runtime not found: ${runtimeFileName}" >&2
+  exit 1
+fi
+
 if [ -z "$NODE_PATH" ]; then
-  export NODE_PATH="$DIR/node_modules"
+  NODE_PATH_CANDIDATE="$DIR/node_modules"
+  if [ ! -d "$NODE_PATH_CANDIDATE" ]; then
+    NODE_PATH_CANDIDATE="$DIR/../Resources/binaries/node_modules"
+  fi
+  export NODE_PATH="$NODE_PATH_CANDIDATE"
 fi
 if [ -z "$DB_CLIENT" ]; then
   export DB_CLIENT=sqlite
 fi
-exec node "$BUNDLE" "$@"
+exec "$NODE_BIN" "$BUNDLE" "$@"
 `;
       const shPath = path.join(BINARIES_DIR, `aiyou-server-${target}`);
       fs.writeFileSync(shPath, shContent);

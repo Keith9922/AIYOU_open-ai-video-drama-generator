@@ -39,7 +39,8 @@
     "externalBin": ["binaries/aiyou-server"],
     "resources": [
       "binaries/server-bundle.cjs",
-      "binaries/node_modules/**/*"
+      "binaries/node_modules/**/*",
+      "binaries/node-runtime-*"
     ],
     "macOS": {
       "minimumSystemVersion": "10.15"
@@ -52,14 +53,7 @@
   },
   "plugins": {
     "shell": {
-      "open": true,
-      "scope": [
-        {
-          "name": "aiyou-server",
-          "cmd": "binaries/aiyou-server",
-          "args": true
-        }
-      ]
+      "open": true
     }
   }
 }

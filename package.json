@@ -21,7 +21,11 @@
     "test:coverage": "vitest run --coverage",
     "tauri:dev": "tauri dev",
     "tauri:build-server": "node scripts/build-server.js",
-    "tauri:build": "pnpm tauri:build-server && tauri build"
+    "tauri:build-server:mac:intel": "node scripts/build-server.js x86_64-apple-darwin",
+    "tauri:build-server:mac:arm64": "node scripts/build-server.js aarch64-apple-darwin",
+    "tauri:build": "pnpm tauri:build-server && tauri build",
+    "tauri:build:mac:intel": "pnpm tauri:build-server:mac:intel && tauri build --target x86_64-apple-darwin",
+    "tauri:build:mac:arm64": "pnpm tauri:build-server:mac:arm64 && tauri build --target aarch64-apple-darwin"
   },
   "dependencies": {
     "@ffmpeg/ffmpeg": "^0.12.15",

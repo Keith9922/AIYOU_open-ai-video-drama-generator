@@ -35,17 +35,24 @@ pub fn run() {
                 let shell = handle.shell();
 
                 // Resolve resource directory where server-bundle.cjs and node_modules live
-                let resource_dir = handle
-                    .path()
-                    .resource_dir()
-                    .expect("failed to resolve resource dir");
+                let resource_dir = match handle.path().resource_dir() {
+                    Ok(dir) => dir,
+                    Err(err) => {
+                        eprintln!("[tauri] failed to resolve resource dir: {}", err);
+                        return;
+                    }
+                };
                 let binaries_res = resource_dir.join("binaries");
 
                 let node_path = binaries_res.join("node_modules");
 
-                let mut cmd = shell
-                    .sidecar("aiyou-server")
-                    .expect("failed to create sidecar command");
+                let mut cmd = match shell.sidecar("aiyou-server") {
+                    Ok(command) => command,
+                    Err(err) => {
+                        eprintln!("[tauri] failed to create sidecar command: {}", err);
+                        return;
+                    }
+                };
 
                 // On Windows, the sidecar is a copy of node.exe — pass server-bundle.cjs as arg
                 #[cfg(target_os = "windows")]
@@ -59,7 +66,13 @@ pub fn run() {
                     .env("NODE_PATH", node_path.to_string_lossy().to_string())
                     .env("DB_CLIENT", "sqlite");
 
-                let (mut rx, child) = cmd.spawn().expect("failed to spawn sidecar");
+                let (mut rx, child) = match cmd.spawn() {
+                    Ok(v) => v,
+                    Err(err) => {
+                        eprintln!("[tauri] failed to spawn sidecar: {}", err);
+                        return;
+                    }
+                };
 
                 // Store child PID for cleanup
                 let state = handle.state::<ServerState>();
