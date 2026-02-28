@@ -2,7 +2,7 @@
  * API 服务统一导出
  */
 
-export { apiRequest, isApiAvailable } from './client';
+export { apiRequest, isApiAvailable, getApiBase, toApiUrl } from './client';
 export type { ApiResponse } from './client';
 
 export {

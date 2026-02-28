@@ -2,6 +2,8 @@ use tauri::Manager;
 use tauri_plugin_shell::ShellExt;
 use std::sync::Mutex;
 
+const SERVER_HEALTH_URL: &str = "http://localhost:3001/api/health";
+
 struct ServerState {
     child_id: Mutex<Option<u32>>,
 }
@@ -10,7 +12,7 @@ struct ServerState {
 async fn check_server_health() -> Result<bool, String> {
     let client = reqwest::Client::new();
     match client
-        .get("http://localhost:3001/api/health")
+        .get(SERVER_HEALTH_URL)
         .timeout(std::time::Duration::from_secs(2))
         .send()
         .await
@@ -108,7 +110,7 @@ pub fn run() {
                 let mut ready = false;
                 for i in 0..60 {
                     match client
-                        .get("http://localhost:3001/api/health")
+                        .get(SERVER_HEALTH_URL)
                         .timeout(std::time::Duration::from_secs(2))
                         .send()
                         .await

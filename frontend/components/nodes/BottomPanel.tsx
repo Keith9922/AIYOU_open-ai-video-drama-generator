@@ -13,6 +13,7 @@ import { NodeType, NodeStatus, StoryboardShot, CharacterProfile } from '../../ty
 import { RefreshCw, Play, Image as ImageIcon, Video as VideoIcon, Type, AlertCircle, CheckCircle, Plus, Maximize2, Download, MoreHorizontal, Wand2, Scaling, FileSearch, Edit, Loader2, Layers, Trash2, X, Upload, Scissors, Film, MousePointerClick, Crop as CropIcon, ChevronDown, ChevronUp, ChevronLeft, ChevronRight, GripHorizontal, Link, Copy, Monitor, Music, Pause, Volume2, Mic2, BookOpen, ScrollText, Clapperboard, LayoutGrid, Box, User, Users, Save, RotateCcw, Eye, List, Sparkles, ZoomIn, ZoomOut, Minus, Circle, Square, Maximize, Move, RotateCw, TrendingUp, TrendingDown, ArrowRight, ArrowUp, ArrowDown, ArrowUpRight, ArrowDownRight, Palette, Grid, Grid3X3, MoveHorizontal, ArrowUpDown, Database, ShieldAlert, ExternalLink, Package } from 'lucide-react';
 import { PromptEditor } from '../PromptEditor';
 import { IMAGE_MODELS, TEXT_MODELS, VIDEO_MODELS, AUDIO_MODELS } from '../../services/modelConfig';
+import { toApiUrl } from '../../services/api/client';
 import {
   IMAGE_ASPECT_RATIOS, VIDEO_ASPECT_RATIOS,
   IMAGE_COUNTS, VIDEO_COUNTS, GLASS_PANEL,
@@ -447,13 +448,13 @@ export const BottomPanel: React.FC<BottomPanelContext> = (ctx) => {
                  let requestBody: any;
 
                  if (provider === 'yunwu') {
-                     apiUrl = 'http://localhost:3001/api/yunwuapi/status';
+                     apiUrl = toApiUrl('/yunwuapi/status');
                      requestBody = { task_id: soraTaskId };
                  } else if (provider === 'sutu') {
-                     apiUrl = 'http://localhost:3001/api/sutu/query';
+                     apiUrl = toApiUrl('/sutu/query');
                      requestBody = { id: soraTaskId };
                  } else if (provider === 'yijiapi') {
-                     apiUrl = `http://localhost:3001/api/yijiapi/query/${encodeURIComponent(soraTaskId)}`;
+                     apiUrl = toApiUrl(`/yijiapi/query/${encodeURIComponent(soraTaskId)}`);
                      requestBody = null;
                  } else {
                      throw new Error('不支持的provider');

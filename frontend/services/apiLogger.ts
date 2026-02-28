@@ -3,6 +3,8 @@
 // Developer: 光波 (a@ggbo.com)
 // Copyright (c) 2025 光波. All rights reserved.
 
+import { toApiUrl } from './api/client';
+
 export type APILogType = 'submission' | 'polling' | 'result';
 
 export interface APILogEntry {
@@ -226,7 +228,7 @@ class APILogger {
      */
     private sendToServer(log: APILogEntry) {
         // 使用 sendBeacon 或 fetch 发送日志
-        const logUrl = 'http://localhost:3001/api/logs';
+        const logUrl = toApiUrl('/logs');
 
         // 清理日志数据以减小大小
         const cleanLog = {

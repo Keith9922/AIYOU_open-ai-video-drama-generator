@@ -3,6 +3,8 @@
  * 从后台管理API加载最新的模型配置
  */
 
+import { toApiUrl } from './api/client';
+
 interface SubModelConfig {
   id: string;
   code: string;
@@ -36,7 +38,7 @@ interface ModelConfiguration {
  */
 export async function loadModelConfig(): Promise<ModelConfiguration> {
   try {
-    const response = await fetch('http://localhost:3001/api/admin/config');
+    const response = await fetch(toApiUrl('/admin/config'));
     if (!response.ok) {
       throw new Error(`Failed to load config: ${response.status}`);
     }

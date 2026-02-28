@@ -15,6 +15,7 @@ import {
 } from './types';
 import { logAPICall } from '../apiLogger';
 import { getSoraModelName } from '../soraModelConfig';
+import { toApiUrl } from '../api/client';
 
 export class YunwuProvider implements SoraProvider {
   readonly name = 'yunwu' as const;
@@ -103,7 +104,7 @@ export class YunwuProvider implements SoraProvider {
       'yunwuSubmitTask',
       async () => {
         // 使用后端代理
-        const apiUrl = 'http://localhost:3001/api/yunwu/create';
+        const apiUrl = toApiUrl('/yunwu/create');
 
         const response = await fetch(apiUrl, {
           method: 'POST',
@@ -172,7 +173,7 @@ export class YunwuProvider implements SoraProvider {
       'yunwuCheckStatus',
       async () => {
         // 使用后端代理
-        const apiUrl = `http://localhost:3001/api/yunwu/query?id=${encodeURIComponent(taskId)}`;
+        const apiUrl = toApiUrl(`/yunwu/query?id=${encodeURIComponent(taskId)}`);
 
 
         const response = await fetch(apiUrl, {

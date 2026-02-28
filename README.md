@@ -91,7 +91,7 @@
 
 ```
 aiyou/
-├── frontend/          # React + TypeScript + Vite (Port 4000)
+├── frontend/          # React + TypeScript + Vite (Dev 默认 5173)
 ├── server/            # Express + Tencent COS (Port 3001)
 └── docs/              # Documentation
 ```
@@ -146,8 +146,7 @@ PORT=3001
 
 Terminal 1 (Backend):
 ```bash
-cd server
-npm start
+npm run dev:backend
 ```
 
 Terminal 2 (Frontend):
@@ -157,7 +156,11 @@ npm run dev
 
 5. **Open your browser**
 
-Visit [http://localhost:4000](http://localhost:4000)
+Frontend (Dev): [http://localhost:5173](http://localhost:5173)  
+Backend Health: [http://localhost:3001/api/health](http://localhost:3001/api/health)
+
+> 可选：后端热重载模式使用 `npm run dev:backend:watch`  
+> 可选：生产预览可使用 `npm run build && npm run preview:4000`，访问 `http://localhost:4000`
 
 ---
 

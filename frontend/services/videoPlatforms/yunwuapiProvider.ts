@@ -11,6 +11,7 @@ import {
   VideoGenerationResult
 } from './types';
 import { logAPICall } from '../apiLogger';
+import { toApiUrl } from '../api/client';
 
 /**
  * 云雾API平台配置
@@ -53,7 +54,7 @@ export class YunwuAPIPlatformProvider implements VideoPlatformProvider {
   ];
 
   private readonly config: YunwuAPIConfig = {
-    baseUrl: 'http://localhost:3001/api/yunwuapi',
+    baseUrl: toApiUrl('/yunwuapi'),
     endpoints: {
       submit: '/create',
       status: '/status'
@@ -285,7 +286,7 @@ export class YunwuAPIPlatformProvider implements VideoPlatformProvider {
 
 
     // Luma 使用独立的端点
-    const response = await fetch(`http://localhost:3001/api/yunwuapi/luma/create`, {
+    const response = await fetch(toApiUrl('/yunwuapi/luma/create'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

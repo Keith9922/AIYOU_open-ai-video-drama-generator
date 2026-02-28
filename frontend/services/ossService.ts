@@ -5,6 +5,7 @@
 
 import { OSSConfig } from '../types';
 import COS from 'cos-js-sdk-v5';
+import { toApiUrl } from './api/client';
 
 /**
  * 生成测试图片
@@ -102,9 +103,6 @@ async function uploadToTencentCOS(
   fileName: string,
   config: OSSConfig
 ): Promise<string> {
-  // 后端 API 地址
-  const API_BASE_URL = 'http://localhost:3001';
-
   // 🔧 确保文件扩展名与 blob 类型一致
   // PNG 转换后，blob.type 是 'image/png'，确保文件名也是 .png
   let finalFileName = fileName;
@@ -119,7 +117,7 @@ async function uploadToTencentCOS(
 
 
   try {
-    const response = await fetch(`${API_BASE_URL}/api/upload-oss`, {
+    const response = await fetch(toApiUrl('/upload-oss'), {
       method: 'POST',
       body: formData,
     });

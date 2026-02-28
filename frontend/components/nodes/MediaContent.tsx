@@ -16,6 +16,7 @@ import { PromptEditor } from '../PromptEditor';
 import { StoryboardVideoNode, StoryboardVideoChildNode } from '../StoryboardVideoNode';
 import { IMAGE_MODELS, TEXT_MODELS, VIDEO_MODELS, AUDIO_MODELS } from '../../services/modelConfig';
 import { promptManager } from '../../services/promptManager';
+import { toApiUrl } from '../../services/api/client';
 import {
   IMAGE_ASPECT_RATIOS, VIDEO_ASPECT_RATIOS, IMAGE_RESOLUTIONS, VIDEO_RESOLUTIONS,
   SHOT_TYPES, CAMERA_ANGLES, CAMERA_MOVEMENTS,
@@ -2365,13 +2366,13 @@ export const MediaContent: React.FC<NodeContentContext> = (ctx) => {
                   let requestBody: any = { task_id: soraTaskId };
 
                   if (provider === 'yunwu') {
-                      apiUrl = 'http://localhost:3001/api/yunwuapi/status';
+                      apiUrl = toApiUrl('/yunwuapi/status');
                       requestBody = { task_id: soraTaskId };
                   } else if (provider === 'sutu') {
-                      apiUrl = 'http://localhost:3001/api/sutu/query';
+                      apiUrl = toApiUrl('/sutu/query');
                       requestBody = { id: soraTaskId };
                   } else if (provider === 'yijiapi') {
-                      apiUrl = `http://localhost:3001/api/yijiapi/query/${encodeURIComponent(soraTaskId)}`;
+                      apiUrl = toApiUrl(`/yijiapi/query/${encodeURIComponent(soraTaskId)}`);
                       requestBody = null;
                   } else {
                       throw new Error('不支持的provider');
@@ -2488,7 +2489,7 @@ export const MediaContent: React.FC<NodeContentContext> = (ctx) => {
                   // 如果有 soraTaskId，先尝试从数据库下载
                   if (soraTaskId) {
                       try {
-                          const downloadUrl = `http://localhost:3001/api/videos/download/${soraTaskId}`;
+                          const downloadUrl = toApiUrl(`/videos/download/${soraTaskId}`);
                           const response = await fetch(downloadUrl);
 
                           if (response.ok) {
@@ -2524,7 +2525,7 @@ export const MediaContent: React.FC<NodeContentContext> = (ctx) => {
                       // 保存到数据库
                       const taskId = soraTaskId || `video-${Date.now()}`;
 
-                      const saveResponse = await fetch('http://localhost:3001/api/videos/save', {
+                      const saveResponse = await fetch(toApiUrl('/videos/save'), {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({
@@ -2541,7 +2542,7 @@ export const MediaContent: React.FC<NodeContentContext> = (ctx) => {
                           alert('视频已保存到数据库！现在开始下载...');
 
                           // 从数据库下载
-                          const downloadUrl = `http://localhost:3001/api/videos/download/${taskId}`;
+                          const downloadUrl = toApiUrl(`/videos/download/${taskId}`);
                           const downloadResponse = await fetch(downloadUrl);
                           const blob = await downloadResponse.blob();
 
@@ -2601,7 +2602,7 @@ export const MediaContent: React.FC<NodeContentContext> = (ctx) => {
                                       };
                                   }
                               }}
-                              src={useLocalServer && soraTaskId ? `http://localhost:3001/api/videos/download/${soraTaskId}` : displayVideoUrl}
+                              src={useLocalServer && soraTaskId ? toApiUrl(`/videos/download/${soraTaskId}`) : displayVideoUrl}
                               className="w-full h-full object-cover bg-zinc-900"
                               loop
                               playsInline

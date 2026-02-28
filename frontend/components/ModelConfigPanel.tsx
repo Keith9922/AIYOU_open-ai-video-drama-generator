@@ -642,7 +642,7 @@ const EditModal: React.FC<EditModalProps> = ({ item, onSave, onCancel }) => {
                   value={formData.baseUrl || ''}
                   onChange={(e) => handleChange('baseUrl', e.target.value)}
                   className="w-full px-4 py-2.5 bg-black/60 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:border-purple-500"
-                  placeholder="如: http://localhost:3001/api/yunwuapi"
+                  placeholder="如: /api/yunwuapi 或 https://your-domain/api/yunwuapi"
                 />
               </div>
               <div className="flex items-center gap-3">

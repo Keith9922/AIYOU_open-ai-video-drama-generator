@@ -18,6 +18,7 @@ import {
 } from './types';
 import { logAPICall } from '../apiLogger';
 import { getSoraModelName } from '../soraModelConfig';
+import { toApiUrl } from '../api/client';
 
 export class SutuProvider implements SoraProvider {
   readonly name = 'sutu' as const;
@@ -47,7 +48,7 @@ export class SutuProvider implements SoraProvider {
     const config = this.transformConfig(params.config);
 
     // ✅ 使用统一的代理端点
-    const submitEndpoint = 'http://localhost:3001/api/sutu/create';
+    const submitEndpoint = toApiUrl('/sutu/create');
 
     // ✅ 动态获取模型名称
     const modelName = getSoraModelName('sutu', params.config.hd);
@@ -165,7 +166,7 @@ export class SutuProvider implements SoraProvider {
     context?: CallContext
   ): Promise<SoraVideoResult> {
     // ✅ 使用统一的代理端点
-    const statusEndpoint = `http://localhost:3001/api/sutu/query?id=${taskId}`;
+    const statusEndpoint = toApiUrl(`/sutu/query?id=${taskId}`);
 
     return logAPICall(
       'sutuCheckStatus',

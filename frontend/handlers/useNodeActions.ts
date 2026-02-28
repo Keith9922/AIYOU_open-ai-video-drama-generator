@@ -14,6 +14,7 @@ import { getGridConfig, STORYBOARD_RESOLUTIONS } from '../services/storyboardCon
 import { saveImageNodeOutput, saveVideoNodeOutput, saveAudioNodeOutput, saveStoryboardGridOutput } from '../utils/storageHelper';
 import { checkImageNodeCache, checkVideoNodeCache, checkAudioNodeCache } from '../utils/cacheChecker';
 import { createNodeQuery } from '../hooks/usePerformanceOptimization';
+import { toApiUrl } from '../services/api/client';
 
 interface UseNodeActionsParams {
   nodesRef: React.MutableRefObject<AppNode[]>;
@@ -1035,13 +1036,13 @@ export function useNodeActions(params: UseNodeActionsParams) {
                   let requestBody: any = { task_id: soraTaskId };
 
                   if (provider === 'yunwu') {
-                      apiUrl = 'http://localhost:3001/api/yunwuapi/status';
+                      apiUrl = toApiUrl('/yunwuapi/status');
                       requestBody = { task_id: soraTaskId, model: 'sora-2-all' };
                   } else if (provider === 'sutu') {
-                      apiUrl = 'http://localhost:3001/api/sutu/query';
+                      apiUrl = toApiUrl('/sutu/query');
                       requestBody = { id: soraTaskId };
                   } else if (provider === 'yijiapi') {
-                      apiUrl = `http://localhost:3001/api/yijiapi/query/${encodeURIComponent(soraTaskId)}`;
+                      apiUrl = toApiUrl(`/yijiapi/query/${encodeURIComponent(soraTaskId)}`);
                       requestBody = null;
                   } else {
                       throw new Error('不支持的provider');
@@ -2743,7 +2744,6 @@ Everything else must be purely visual with no text whatsoever.
                           storyboardCurrentPage: targetPageIndex,
                           storyboardTotalPages: updatedGrids.length,
                           storyboardShots: extractedShots,
-                          storyboardRegeneratePanel: undefined, // Clear both flags
                           storyboardRegeneratePanel: undefined
                       });
 

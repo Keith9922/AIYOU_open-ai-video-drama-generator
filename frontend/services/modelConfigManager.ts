@@ -3,6 +3,8 @@
  * 用于管理视频平台的模型配置，支持动态添加、编辑、删除模型
  */
 
+import { toApiUrl } from './api/client';
+
 // ============================================================
 // 类型定义
 // ============================================================
@@ -75,7 +77,7 @@ const DEFAULT_CONFIG: ModelConfiguration = {
       name: '云雾API',
       description: '云雾AI视频生成平台',
       enabled: true,
-      baseUrl: 'http://localhost:3001/api/yunwuapi',
+      baseUrl: toApiUrl('/yunwuapi'),
       apiKeyRequired: true,
       models: [
         {
